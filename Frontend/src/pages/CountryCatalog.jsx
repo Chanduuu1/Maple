@@ -1,28 +1,48 @@
 import { useLocation } from 'react-router-dom';
 import Navbar from '../components/navbar';
+import HeroCarousel from '../components/HeroCarousel';
+import CountryRow from '../components/CountryRow';
+import { featuredCountries, categorizedCountries } from '../data/countries';
 
 const CountryCatalog = () => {
   const location = useLocation();
   const dates = location.state?.dates;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50">
       <Navbar />
-      <div className="pt-32 px-6">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+      
+      <div className="pt-28 pb-20">
+        {/* Header */}
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
             Choose Your Destination
           </h1>
           {dates && (
-            <p className="text-gray-600 mb-8">
-              Traveling from {dates.from?.toLocaleDateString()} to {dates.to?.toLocaleDateString()}
+            <p className="text-xl text-gray-600">
+              Traveling from{' '}
+              <span className="font-semibold text-emerald-600">
+                {dates.from?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
+              {' '}to{' '}
+              <span className="font-semibold text-emerald-600">
+                {dates.to?.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              </span>
             </p>
           )}
-          <div className="bg-white rounded-lg p-12 text-center">
-            <p className="text-2xl text-gray-400">
-              Country catalog coming next! 🌍
-            </p>
-          </div>
+        </div>
+
+        {/* Hero Carousel */}
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <HeroCarousel countries={featuredCountries} />
+        </div>
+
+        {/* Categorized Countries */}
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 space-y-12">
+          <CountryRow category={categorizedCountries.summer} />
+          <CountryRow category={categorizedCountries.northernLights} />
+          <CountryRow category={categorizedCountries.adventure} />
+          <CountryRow category={categorizedCountries.cultural} />
         </div>
       </div>
     </div>

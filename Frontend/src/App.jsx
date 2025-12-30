@@ -1,15 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import CountryCatalog from './pages/CountryCatalog';
+import CountryDetail from './pages/CountryDetail';  // ← NOW it's a PAGE component!
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/countries" element={<CountryCatalog />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/countries" element={<CountryCatalog />} />
+      <Route path="/countries/:countryName" element={<CountryDetail />} />
+    </Routes>
   );
 }
 

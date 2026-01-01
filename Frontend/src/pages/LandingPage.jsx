@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useItinerary } from '../context/ItineraryContext'; // ADD THIS
 import Navbar from '../components/navbar';
 import DateRangePicker from '../components/DateRangePicker';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [travelDates, setTravelDates] = useState({ from: null, to: null });
+  const { setTravelDates } = useItinerary(); // ADD THIS
+  const [travelDates, setLocalTravelDates] = useState({ from: null, to: null });
 
   const handleLetsGo = () => {
     if (travelDates.from && travelDates.to) {
-      // Navigate to country catalog with dates in state
-      navigate('/countries', { state: { dates: travelDates } });
+      // Save to context
+      setTravelDates({
+        from: travelDates.from.toISOString().split('T')[0],
+        to: travelDates.to.toISOString().split('T')[0]
+      });
+      navigate('/countries');
     } else {
       alert('Please select both start and end dates');
     }
@@ -47,7 +53,7 @@ const LandingPage = () => {
                   When are you traveling?
                 </h2>
                 
-                <DateRangePicker onDatesChange={setTravelDates} />
+                <DateRangePicker onDatesChange={setLocalTravelDates} />
 
                 {/* Let's Go Button */}
                 <button

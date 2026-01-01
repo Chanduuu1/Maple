@@ -1,17 +1,23 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Hotel, Plane, UtensilsCrossed, MapPin } from 'lucide-react';
+import { ChevronDown, ChevronUp, Hotel, Plane, UtensilsCrossed, MapPin, CalendarCheck } from 'lucide-react';
+import { useItinerary } from '../context/ItineraryContext';
 import BookStaysModal from './BookStaysModal';
 import BookTravelModal from './BookTravelModal';
 import ExploreCuisinesModal from './ExploreCuisinesModal';
 import ExploreAttractionsModal from './ExploreAttractionsModal';
+import PlacePlanningModal from './PlacePlanningModal'; // NEW
 
 const PlaceCard = ({ place, countryName }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
+  const { itinerary } = useItinerary();
+
+  // Check if place is in itinerary
+  const isPlanned = itinerary.places.some(p => p.placeId === place.id);
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+      <div className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${isPlanned ? 'ring-2 ring-green-500' : ''}`}>
         {/* Place Image */}
         <div className="relative h-48 overflow-hidden">
           <img
@@ -22,6 +28,12 @@ const PlaceCard = ({ place, countryName }) => {
           <div className="absolute top-4 right-4 bg-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
             {place.estimatedDays}
           </div>
+          {isPlanned && (
+            <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+              <CalendarCheck className="w-4 h-4" />
+              Planned
+            </div>
+          )}
         </div>
 
         {/* Card Content */}
@@ -33,6 +45,18 @@ const PlaceCard = ({ place, countryName }) => {
               <p className="text-gray-600">{place.description}</p>
             </div>
           </div>
+
+          {/* MAIN PLANNING BUTTON */}
+          <button
+            onClick={() => setActiveModal('planning')}
+            className={`w-full mb-4 px-6 py-4 rounded-xl font-semibold text-lg transition-all ${
+              isPlanned
+                ? 'bg-green-500 text-white hover:bg-green-600'
+                : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:shadow-lg'
+            }`}
+          >
+            {isPlanned ? '✓ Edit Your Plan' : '📅 Plan Your Visit'}
+          </button>
 
           {/* Expand/Collapse Button */}
           <button
@@ -80,47 +104,54 @@ const PlaceCard = ({ place, countryName }) => {
                   ))}
                 </ul>
               </div>
+
+              {/* Secondary Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-200">
+                <button
+                  onClick={() => setActiveModal('stays')}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  <Hotel className="w-4 h-4" />
+                  <span>Stays</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveModal('travel')}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  <Plane className="w-4 h-4" />
+                  <span>Travel</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveModal('cuisines')}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  <UtensilsCrossed className="w-4 h-4" />
+                  <span>Cuisines</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveModal('attractions')}
+                  className="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                >
+                  <MapPin className="w-4 h-4" />
+                  <span>Attractions</span>
+                </button>
+              </div>
             </div>
           )}
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => setActiveModal('stays')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors font-semibold"
-            >
-              <Hotel className="w-5 h-5" />
-              <span className="text-sm">Book Stays</span>
-            </button>
-
-            <button
-              onClick={() => setActiveModal('travel')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
-            >
-              <Plane className="w-5 h-5" />
-              <span className="text-sm">Book Travel</span>
-            </button>
-
-            <button
-              onClick={() => setActiveModal('cuisines')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold"
-            >
-              <UtensilsCrossed className="w-5 h-5" />
-              <span className="text-sm">Cuisines</span>
-            </button>
-
-            <button
-              onClick={() => setActiveModal('attractions')}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold"
-            >
-              <MapPin className="w-5 h-5" />
-              <span className="text-sm">Attractions</span>
-            </button>
-          </div>
         </div>
       </div>
 
       {/* Modals */}
+      {activeModal === 'planning' && (
+        <PlacePlanningModal
+          place={place}
+          onClose={() => setActiveModal(null)}
+        />
+      )}
+
       {activeModal === 'stays' && (
         <BookStaysModal
           place={place}

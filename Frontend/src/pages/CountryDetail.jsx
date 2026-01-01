@@ -15,11 +15,12 @@ const CountryDetail = () => {
   // Get country data
   const country = countryDetails[countryName.toLowerCase()];
 
+  // FIX: Remove setCountry from dependencies
   useEffect(() => {
     if (country) {
       setCountry(country.name);
     }
-  }, [country, setCountry]);
+  }, [country?.name]); // Only depend on country.name, not setCountry
 
   // If country not found, redirect
   if (!country) {
@@ -94,15 +95,15 @@ const CountryDetail = () => {
 
         {/* Finalize Itinerary Button */}
         {itinerary.places.length > 0 && (
-        <div className="mt-12 text-center">
-          <button
-            onClick={() => navigate('/itinerary-summary')}
-            className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-lg font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
-          >
-            View Itinerary Summary ({itinerary.places.length} {itinerary.places.length === 1 ? 'place' : 'places'}) →
-          </button>
-        </div>
-      )}
+          <div className="mt-12 text-center">
+            <button
+              onClick={() => navigate('/itinerary-summary')}
+              className="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-lg font-semibold rounded-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+            >
+              View Itinerary Summary ({itinerary.places.length} {itinerary.places.length === 1 ? 'place' : 'places'}) →
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

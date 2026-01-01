@@ -27,7 +27,7 @@ const ItinerarySummary = () => {
     : 0;
 
   const plannedDays = itinerary.places.reduce((total, place) => {
-    if (place.dateRange) {
+    if (place.dateRange && place.dateRange.from && place.dateRange.to) {
       const days = Math.ceil((new Date(place.dateRange.to) - new Date(place.dateRange.from)) / (1000 * 60 * 60 * 24)) + 1;
       return total + days;
     }
@@ -36,10 +36,10 @@ const ItinerarySummary = () => {
 
   const isFullyPlanned = plannedDays === totalTripDays;
 
-  // Sort places by date
-  const sortedPlaces = [...itinerary.places].sort((a, b) => 
-    new Date(a.dateRange.from) - new Date(b.dateRange.from)
-  );
+  // FIX: Filter out places without dateRange and sort
+  const sortedPlaces = itinerary.places
+    .filter(place => place.dateRange && place.dateRange.from && place.dateRange.to) // Only include places with valid dates
+    .sort((a, b) => new Date(a.dateRange.from) - new Date(b.dateRange.from));
 
   const toggleExpand = (placeId) => {
     setExpandedPlaces(prev => ({
@@ -63,7 +63,8 @@ const ItinerarySummary = () => {
     navigate('/booking');
   };
 
-  if (!itinerary.country || itinerary.places.length === 0) {
+  // FIX: Better validation for empty itinerary
+  if (!itinerary.country || !itinerary.places || itinerary.places.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
@@ -76,6 +77,39 @@ const ItinerarySummary = () => {
               className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
             >
               Start Planning
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // FIX: If no places have dates, show a different message
+  if (sortedPlaces.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+          <button
+            onClick={() => navigate(`/countries/${itinerary.country.toLowerCase()}`)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Planning</span>
+          </button>
+
+          <div className="text-center py-12">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Your <span className="text-emerald-500">{itinerary.country}</span> Itinerary
+            </h1>
+            <p className="text-gray-600 mb-8">
+              You have {itinerary.places.length} place(s) selected, but no dates planned yet.
+            </p>
+            <button
+              onClick={() => navigate(`/countries/${itinerary.country.toLowerCase()}`)}
+              className="px-6 py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors"
+            >
+              Plan Your Dates
             </button>
           </div>
         </div>
@@ -121,7 +155,7 @@ const ItinerarySummary = () => {
             </div>
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5" />
-              <span>{itinerary.places.length} destinations</span>
+              <span>{sortedPlaces.length} destination{sortedPlaces.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
         </div>
@@ -137,7 +171,7 @@ const ItinerarySummary = () => {
           <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
             <div
               className="bg-gradient-to-r from-emerald-500 to-teal-600 h-4 rounded-full transition-all duration-300"
-              style={{ width: `${(plannedDays / totalTripDays) * 100}%` }}
+              style={{ width: `${totalTripDays > 0 ? (plannedDays / totalTripDays) * 100 : 0}%` }}
             ></div>
           </div>
           {isFullyPlanned ? (
@@ -147,7 +181,7 @@ const ItinerarySummary = () => {
             </div>
           ) : (
             <p className="text-sm text-gray-600">
-              {totalTripDays - plannedDays} days remaining to plan
+              {totalTripDays - plannedDays} day{totalTripDays - plannedDays !== 1 ? 's' : ''} remaining to plan
             </p>
           )}
         </div>

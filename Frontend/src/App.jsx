@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import CountryCatalog from './pages/CountryCatalog';
-import CountryDetail from './pages/CountryDetail';  // ← NOW it's a PAGE component!
+import CountryDetail from './pages/CountryDetail'; 
 
 function App() {
   return (

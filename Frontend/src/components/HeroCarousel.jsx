@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Navigation, Autoplay } from 'swiper/modules';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/navigation';
 
 const HeroCarousel = ({ countries }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
 
   return (
     <div className="relative w-full h-[500px] mb-16">
@@ -16,7 +18,7 @@ const HeroCarousel = ({ countries }) => {
         grabCursor={true}
         centeredSlides={true}
         slidesPerView={'auto'}
-        loop={true}  // ✨ THIS MAKES IT CIRCULAR!
+        loop={true}  //  THIS MAKES IT CIRCULAR!
         coverflowEffect={{
           rotate: 0,
           stretch: 0,
@@ -71,7 +73,9 @@ const HeroCarousel = ({ countries }) => {
                   <p className="text-xl text-gray-200 mb-2">{country.tagline}</p>
                   <p className="text-gray-300 max-w-lg">{country.description}</p>
                   
-                  <button className="mt-6 px-8 py-3 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
+                  <button 
+                    onClick={() => navigate(`/countries/${country.name.toLowerCase()}`)}
+                  className="mt-6 px-8 py-3 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
                     Explore {country.name}
                   </button>
                 </motion.div>
